@@ -1,3 +1,9 @@
+import java.util.Properties
+
+val dotenv = Properties().apply {
+    file(".env").reader().use { load(it) }
+}
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.5.7"
@@ -34,4 +40,10 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.named<JavaExec>("bootRun") {
+    dotenv.forEach { (key, value) ->
+        environment(key.toString(), value.toString())
+    }
 }
