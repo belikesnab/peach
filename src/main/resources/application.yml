@@ -3,8 +3,8 @@ spring:
     name: peach
   datasource:
     url: jdbc:postgresql://localhost:5432/auth_db
-    username: ${POSTGRES_USERNAME}
-    password: ${POSTGRES_PASSWORD}
+    username: postgres
+    password: peach@admin123
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,10 +13,18 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/auth_db
+    user: postgres
+    password: peach@admin123
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: SecretKeyThatIsAtLeast256BitsLongForHS256Algorithm
     expiration-ms: 86400000
 
 logging:
