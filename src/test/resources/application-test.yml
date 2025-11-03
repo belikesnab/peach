@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test_db
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  sql:
+    init:
+      mode: never
+
+app:
+  jwt:
+    secret: f7f61f7547b5ef811b77d6cf30d27dcfb0ab52bc0e8f74a876643c07fcb94d71  # random generated
+    expiration-ms: 3600000
+
+logging:
+  level:
+    com.example.auth: DEBUG
