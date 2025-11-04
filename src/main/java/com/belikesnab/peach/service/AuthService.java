@@ -1,9 +1,6 @@
 package com.belikesnab.peach.service;
 
-import com.belikesnab.peach.dto.AuthResponse;
-import com.belikesnab.peach.dto.LoginRequest;
-import com.belikesnab.peach.dto.MessageResponse;
-import com.belikesnab.peach.dto.RegisterRequest;
+import com.belikesnab.peach.dto.*;
 import com.belikesnab.peach.entity.User;
 import com.belikesnab.peach.repository.UserRepository;
 import com.belikesnab.peach.security.JwtUtils;
@@ -14,6 +11,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -66,18 +64,23 @@ public class AuthService {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             String jwt = jwtUtils.generateJwt(authentication);
 
-            // Reset failed attempts and update last login
             user.setFailedLoginAttempts(0);
             user.setLastLogin(LocalDateTime.now());
+
             userRepository.save(user);
 
             return new AuthResponse(jwt, user.getId(), user.getUsername(), user.getEmail(), user.getRoles());
+
         } catch (BadCredentialsException e) {
             handleFailedLogin(user);
-
-            throw(e);
+            // After handling failed login, check if account just got locked
+            if (!user.isAccountNonLocked()) {
+                throw new LockedException("Account is locked due to too many failed login attempts");
+            }
+            throw e;
         }
     }
 
@@ -101,5 +104,21 @@ public class AuthService {
         userRepository.save(user);
 
         return new MessageResponse("User registered successfully");
+    }
+
+    public UserInfoResponse getCurrentUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        return new UserInfoResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRoles(),
+                user.isEnabled(),
+                user.isAccountNonLocked(),
+                user.getLastLogin(),
+                user.getCreatedAt()
+        );
     }
 }

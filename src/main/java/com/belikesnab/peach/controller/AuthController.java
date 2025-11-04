@@ -1,9 +1,6 @@
 package com.belikesnab.peach.controller;
 
-import com.belikesnab.peach.dto.AuthResponse;
-import com.belikesnab.peach.dto.LoginRequest;
-import com.belikesnab.peach.dto.MessageResponse;
-import com.belikesnab.peach.dto.RegisterRequest;
+import com.belikesnab.peach.dto.*;
 import com.belikesnab.peach.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +29,7 @@ public class AuthController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> getCurrentUser(Authentication authentication) {
-        return ResponseEntity.ok("Authenticated user: " + authentication.getName());
+    public ResponseEntity<UserInfoResponse> getCurrentUser(Authentication authentication) {
+        return ResponseEntity.ok(authService.getCurrentUser(authentication.getName()));
     }
 }
