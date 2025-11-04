@@ -4,6 +4,8 @@ val dotenv = Properties().apply {
     file(".env").reader().use { load(it) }
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
+
 plugins {
 	java
 	id("org.springframework.boot") version "3.5.7"
@@ -36,11 +38,14 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
     testImplementation("com.h2database:h2")
+    testImplementation("org.mockito:mockito-core:5.14.0")
     testImplementation("org.testcontainers:postgresql:1.19.3")
     testImplementation("org.testcontainers:junit-jupiter:1.19.3")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    mockitoAgent("org.mockito:mockito-core:5.14.0") { isTransitive = false }
 }
 
 tasks.withType<Test> {
@@ -52,3 +57,8 @@ tasks.named<JavaExec>("bootRun") {
         environment(key.toString(), value.toString())
     }
 }
+
+tasks.test {
+    jvmArgs("-javaagent:${mockitoAgent.asPath}")
+}
+
