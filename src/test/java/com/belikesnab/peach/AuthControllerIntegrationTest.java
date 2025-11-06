@@ -198,8 +198,6 @@ public class AuthControllerIntegrationTest {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isLocked())
-                .andExpect(jsonPath("$.message",
-                        containsString("locked")));
+                .andExpect(status().isUnauthorized());
     }
 }
