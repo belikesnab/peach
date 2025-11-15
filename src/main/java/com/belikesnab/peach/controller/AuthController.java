@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5173")     // for dev: using pear project frontend
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
